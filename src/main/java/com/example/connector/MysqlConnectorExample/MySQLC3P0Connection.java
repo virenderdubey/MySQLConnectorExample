@@ -9,6 +9,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import javax.sql.ConnectionPoolDataSource;
+import javax.sql.PooledConnection;
+
 import com.mchange.v2.c3p0.*;
 
 public class MySQLC3P0Connection {
@@ -23,15 +27,16 @@ public class MySQLC3P0Connection {
     private String password = null;
     private String database = null;
     private String query = null;
+    ComboPooledDataSource cpds = null;
     
     
-	MySQLC3P0Connection(String host, String port, String username, String password, String database) {
+	MySQLC3P0Connection(String host, String port, String username, String password, String database) throws PropertyVetoException {
 		this.host = host;
 		this.port = port;
 		this.username = username;
 		this.password = password;
 		this.database = database;
-		
+		this.cpds = this.connect();
 	}
 
 	public String getConnectionString()  {
@@ -45,16 +50,20 @@ public class MySQLC3P0Connection {
 		cpds.setUser(this.username);                                  
 		cpds.setPassword(this.password);
 		// some default pooling
-		cpds.setMinPoolSize(2);                                     
+		cpds.setInitialPoolSize(5);
+		cpds.setMaxConnectionAge(100);
+		cpds.setMaxIdleTime(300);
+		cpds.setMinPoolSize(3);                                     
 		cpds.setAcquireIncrement(2);
 		cpds.setMaxPoolSize(10);
-		return  cpds;
+		return cpds;
 	}
 
 	public HashMap<String, ArrayList> readDatabase(String query) throws SQLException, ClassNotFoundException, PropertyVetoException {
 		HashMap<String, ArrayList> response = new HashMap<String, ArrayList>();
-		ComboPooledDataSource cpds = this.connect();
-		this.conn = cpds.getConnection();
+		PooledConnection cn = cpds.getConnectionPoolDataSource().getPooledConnection();
+		this.conn = cn.getConnection();
+		// this.conn = cpds.getConnection();
         statement = this.conn.createStatement();
         results = statement.executeQuery(query);
         ResultSetMetaData rsmd = results.getMetaData();
@@ -77,7 +86,7 @@ public class MySQLC3P0Connection {
         response.put("columns", columns);
         response.put("values", values);
         //System.out.println(response);
-    	 return response;
+    	return response;
 	}
 
 	public void execute(String query) throws PropertyVetoException, ClassNotFoundException, SQLException {

@@ -34,14 +34,14 @@ public class MySQL5 {
 	    String database = props.getProperty("database", "test");
 	    String query = props.getProperty("query", "select  2+2");
 
-	    // MySQLConnection obj = new MySQLConnection(host, port, username, password, database);
+	    //MySQLConnection obj = new MySQLConnection(host, port, username, password, database);
 	    MySQLC3P0Connection obj = new MySQLC3P0Connection(host, port, username, password, database);
 	    obj.execute("show  tables");
 	    obj.execute("show  tables");
 	    obj.execute("show  tables");
-	    obj.execute("show  tables");
-	    obj.execute("show  tables");
-	    obj.execute("show  tables");
+	    // obj.execute("show  tables");
+	    // obj.execute("show  tables");
+	    // obj.execute("show  tables");
 	    
     }
 }

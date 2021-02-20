@@ -24,12 +24,13 @@ public class MySQLConnection {
     private String query = null;
     
     
-	MySQLConnection(String host, String port, String username, String password, String database) {
+	MySQLConnection(String host, String port, String username, String password, String database) throws ClassNotFoundException, SQLException {
 		this.host = host;
 		this.port = port;
 		this.username = username;
 		this.password = password;
 		this.database = database;
+		this.connect();
 	}
 
 	private void connect() throws SQLException, ClassNotFoundException {
@@ -45,7 +46,7 @@ public class MySQLConnection {
 
 	public HashMap<String, ArrayList> readDatabase(String query) throws SQLException, ClassNotFoundException {
 		HashMap<String, ArrayList> response = new HashMap<String, ArrayList>();
-		this.connect();
+		// this.connect();
         results = this.statement.executeQuery(query);
         ResultSetMetaData rsmd = results.getMetaData();
         ArrayList<String> columns = new ArrayList<String>();
